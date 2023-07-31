@@ -60,13 +60,19 @@ class UserDetailList:
     def set_iam_data(self, iam_data: Dict[str, Dict[Any, Any]]) -> None:
         self.iam_data = iam_data
         for user in self.users:
-            user.set_iam_data(iam_data)
+            try:
+                user.set_iam_data(iam_data)
+            except Exception as e:
+                print(f"Error in set_iam_data: {e}")
 
     def get_all_allowed_actions_for_user(self, name: str) -> Optional[List[str]]:
         """Returns a list of all allowed actions by the user across all its policies"""
         for user_detail in self.users:
-            if user_detail.user_name == name:
-                return user_detail.all_allowed_actions
+            try:
+                if user_detail.user_name == name:
+                    return user_detail.all_allowed_actions
+            except Exception as e:
+                print(f"Error in get_all_allowed_actions_for_user: {e}")
         return None
 
     def get_all_iam_statements_for_user(
@@ -74,8 +80,11 @@ class UserDetailList:
     ) -> Optional[List[StatementDetail]]:
         """Returns a list of all StatementDetail objects across all the policies assigned to the user"""
         for user_detail in self.users:
-            if user_detail.user_name == name:
-                return user_detail.all_iam_statements
+            try:
+                if user_detail.user_name == name:
+                    return user_detail.all_iam_statements
+            except Exception as e:
+                print(f"Error in get_all_iam_statements_for_user: {e}")
         return None
 
     @property
@@ -90,8 +99,11 @@ class UserDetailList:
         """Return a list of all infrastructure modification actions allowed by all inline policies in violation."""
         result = set()
         for user in self.users:
-            for policy in user.inline_policies:
-                result.update(policy.policy_document.infrastructure_modification)
+            try:
+                for policy in user.inline_policies:
+                    result.update(policy.policy_document.infrastructure_modification)
+            except Exception as e:
+                print(f"Error in all_infrastructure_modification_actions_by_inline_policies: {e}")
         return sorted(result)
 
     @property
@@ -99,7 +111,10 @@ class UserDetailList:
         """Return JSON representation of attached inline policies"""
         results = {}
         for user_detail in self.users:
-            results.update(user_detail.inline_policies_json)
+            try:
+                results.update(user_detail.inline_policies_json)
+            except Exception as e:
+                print(f"Error in inline_policies_json: {e}")
         return results
 
     @property

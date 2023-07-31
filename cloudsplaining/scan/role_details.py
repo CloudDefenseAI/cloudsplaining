@@ -75,13 +75,19 @@ class RoleDetailList:
     def set_iam_data(self, iam_data: Dict[str, Dict[Any, Any]]) -> None:
         self.iam_data = iam_data
         for role in self.roles:
-            role.set_iam_data(iam_data)
+            try:
+                role.set_iam_data(iam_data)
+            except Exception as e:
+                print(f"Error in set_iam_data: {e}")
 
     def get_all_allowed_actions_for_role(self, name: str) -> Optional[List[str]]:
         """Returns a list of all allowed actions by the role across all its policies"""
         for role_detail in self.roles:
-            if role_detail.role_name == name:
-                return role_detail.all_allowed_actions
+            try:
+                if role_detail.role_name == name:
+                    return role_detail.all_allowed_actions
+            except Exception as e:
+                print(f"Error in get_all_allowed_actions_for_role: {e}")
         return None
 
     def get_all_iam_statements_for_role(
@@ -105,8 +111,11 @@ class RoleDetailList:
         """Return a list of all infrastructure modification actions allowed by all inline policies in violation."""
         result = set()
         for role in self.roles:
-            for policy in role.inline_policies:
-                result.update(policy.policy_document.infrastructure_modification)
+            try:
+                for policy in role.inline_policies:
+                    result.update(policy.policy_document.infrastructure_modification)
+            except Exception as e:
+                print(f"Error in all_infrastructure_modification_actions_by_inline_policies: {e}")
         return sorted(result)
 
     @property
@@ -114,7 +123,10 @@ class RoleDetailList:
         """Return JSON representation of attached inline policies"""
         results = {}
         for role_detail in self.roles:
-            results.update(role_detail.inline_policies_json)
+            try:
+                results.update(role_detail.inline_policies_json)
+            except Exception as e:
+                print(f"Error in inline_policies_json: {e}")
         return results
 
     @property

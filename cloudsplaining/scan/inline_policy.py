@@ -69,27 +69,33 @@ class InlinePolicy:
     def getFindingLinks(self, findings: Any) -> List[Any]:
         links: List[Any] = []
         for finding in findings:
-            links[
-                finding["type"]
-            ] = f'https://cloudsplaining.readthedocs.io/en/latest/glossary/privilege-escalation/#{finding["type"]}'
+            try:
+                links[
+                    finding["type"]
+                ] = f'https://cloudsplaining.readthedocs.io/en/latest/glossary/privilege-escalation/#{finding["type"]}'
+            except Exception as e:
+                print(f"Error occurred in getFindingLinks: {e}")
         return links
 
     @property
     def getAttached(self) -> Dict[str, List[Any]]:
         attached: Dict[str, List[Any]] = {"roles": [], "groups": [], "users": []}
-        for principalType in ["roles", "groups", "users"]:
-            principals = (self.iam_data[principalType]).keys()
-            for principalID in principals:
-                inlinePolicies = {}
-                if self.is_excluded:
-                    return {}
-                inlinePolicies.update(
-                    self.iam_data[principalType][principalID]["inline_policies"]
-                )
-                if self.policy_id in inlinePolicies:
-                    attached[principalType].append(
-                        self.iam_data[principalType][principalID]["name"]
+        try:
+            for principalType in ["roles", "groups", "users"]:
+                principals = (self.iam_data[principalType]).keys()
+                for principalID in principals:
+                    inlinePolicies = {}
+                    if self.is_excluded:
+                        return {}
+                    inlinePolicies.update(
+                        self.iam_data[principalType][principalID]["inline_policies"]
                     )
+                    if self.policy_id in inlinePolicies:
+                        attached[principalType].append(
+                            self.iam_data[principalType][principalID]["name"]
+                    )
+        except Exception as e:
+            print(f"Error occurred in getAttached: {e}")
         return attached
 
     @property
